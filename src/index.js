@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as util from 'three-sac/ui-util.js';
+import loader from 'three-sac/ui-basic-loader.js';
 import config from './config.json';
 import Voronoi from 'voronoi';
 
@@ -136,7 +137,43 @@ const icosphere = (order = 0) => {
     return {vertices, triangles};
 }
 
+
+const model_loader = {
+    count: 0,
+    queue_length: null,
+    bytes_loaded: 0,
+    delta_time: 0,
+    complete(resources, cat){
+        let message = `(${model_load.queue_length}) ${cat} loaded (${util.formatBytes(model_load.bytes_loaded)}) in ${util.formatMs(model_load.delta_time.stop())}.`;
+        wedge.loader.messages(message);
+        wedge.loader.model_post_load(resources);
+    },
+    status(count, obj){
+        let message;
+        if(count === 1){
+            obj.t = util.timer(obj.id).start();
+            message = `${obj.id+1} : ${obj.url} : ${obj.size}`;
+        }else{
+            model_load.bytes_loaded += Number(obj.size);
+            const t = obj.t.stop();
+            message = `${(model_load.queue_length-model_load.count)+1}/${model_load.queue_length} : ${obj.url} : ${util.formatBytes(obj.size)} : ${util.formatMs(t)}.`;
+        }
+        model_load.count += count;
+        wedge.loader.messages(message);
+    },
+    run(){
+        model_load.delta_time = util.timer('delta_time').start();
+        const queue = wedge.config.sources.map((ca, id) => {
+            return {url: `${ca[1]}`, variable: ca[0], size:'loading', type: 'json', cat: 'sources', id:id};
+        });
+        model_load.queue_length = queue.length;
+        loader(queue, model_load.status).then(r => model_load.complete(r, 'sources') );
+    }
+}
+
+
 const wedge = {
+    config: config,
     intersection_filter(intersection){
         wedge.trace.num = intersection.faceIndex;
         wedge.trace.pos = intersection.face.normal.toArray();
@@ -435,7 +472,23 @@ const wedge = {
                 }
             }
             return sample;
+        },
+        download_new_model(link_target) {
+            //#// builder function for wedge model or just load.
+            const build_timer = util.timer('build-model').start();
+            wedge.build.buildModel();
+            [
+                [wedge.abstract.mappings, 'mappings-all.json'],
+                [wedge.abstract.faces, 'faces-all.json'],
+                [wedge.abstract.vertices, 'vertices-all.json'],
+                [wedge.abstract.indices, 'indices-all.json'],
+            ].map(dl => {
+                const a = util.obj_to_download(dl[0], dl[1], 'auto');
+                if (a) link_target.appendChild(a);
+            });
+            console.log(build_timer.var_name, util.formatMs(build_timer.stop()));
         }
+
     },
     parser:{
         format_raw_sample(sample){
@@ -536,8 +589,8 @@ const wedge = {
                     }
                 });
 
-                if(config.gauss.on){
-                    const filter_obj = util.gauss.filter(d_grid, config.gauss.sigma);
+                if(wedge.config.gauss.on){
+                    const filter_obj = util.gauss.filter(d_grid, wedge.config.gauss.sigma);
                     const d = [d_grid.length, d_grid[0].length];
                     for (let i=0;i<d[0];i++){
                         for (let j=0;j<d[1];j++) {
@@ -664,6 +717,26 @@ const wedge = {
             }
 
         }
+    },
+    loader: {
+        messages: (msg) => {
+            console.log(msg);
+        },
+        model_post_load: (resources) => {
+            const model_timer = util.timer('delta_time').start();
+            resources.map(r => {
+                wedge.abstract[r.variable] = r.raw;
+            })
+
+            // init_vars.model.add(Model.get_object());
+            // //Model.model.north_south.rotateX(util.deg_to_rad(-23.5));
+            // Model.model.mesh.rotateY(Math.PI/2);
+            //
+            // init_vars.data_index = 0;
+            // Model.ready = true;
+            wedge.loader.messages(['model build in', util.formatMs(model_timer.stop())]);
+        },
+        model_loader
     }
 }
 

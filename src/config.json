@@ -5,12 +5,11 @@
   "order": 5,
   "scale": 6.5,
   "bias": 0.5,
-  "assets": [
-        ["mappings","./js/assets/mappings-all.json"],
-        ["faces","./js/assets/faces-all.json"],
-        ["indices","./js//assets/indices-all.json"],
-        ["vertices","./js/assets/vertices-all.json"],
-        ["sample_data","./js/1-15-2023-9-50.json"]
+  "sources": [
+        ["mappings","./sources/mappings-all.json"],
+        ["faces","./sources/faces-all.json"],
+        ["indices","./sources/indices-all.json"],
+        ["vertices","./sources/vertices-all.json"]
   ],
   "prepare_model_download" : false,
   "default_data_shape": [20,91],
