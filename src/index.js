@@ -478,10 +478,10 @@ const wedge = {
             const build_timer = util.timer('build-model').start();
             wedge.build.buildModel();
             [
-                [wedge.abstract.mappings, 'mappings-all.json'],
-                [wedge.abstract.faces, 'faces-all.json'],
-                [wedge.abstract.vertices, 'vertices-all.json'],
-                [wedge.abstract.indices, 'indices-all.json'],
+                [{'mappings': wedge.abstract.mappings}, 'mappings.json'],
+                [{'faces': wedge.abstract.faces}, 'faces.json'],
+                [{'vertices': wedge.abstract.vertices}, 'vertices.json'],
+                [{'indices': wedge.abstract.indices}, 'indices.json'],
             ].map(dl => {
                 const a = util.obj_to_download(dl[0], dl[1], 'auto');
                 if (a) link_target.appendChild(a);
@@ -725,7 +725,7 @@ const wedge = {
         model_post_load: (resources) => {
             const model_timer = util.timer('delta_time').start();
             resources.map(r => {
-                wedge.abstract[r.variable] = r.raw;
+                wedge.abstract[r.variable] = r.raw[r.variable];
             })
 
             // init_vars.model.add(Model.get_object());
