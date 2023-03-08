@@ -144,7 +144,7 @@ const model_loader = {
     bytes_loaded: 0,
     delta_time: 0,
     complete(resources, cat){
-        let message = `(${model_load.queue_length}) ${cat} loaded (${util.formatBytes(model_load.bytes_loaded)}) in ${util.formatMs(model_load.delta_time.stop())}.`;
+        let message = `(${model_loader.queue_length}) ${cat} loaded (${util.formatBytes(model_loader.bytes_loaded)}) in ${util.formatMs(model_loader.delta_time.stop())}.`;
         wedge.loader.messages(message);
         wedge.loader.model_post_load(resources);
     },
@@ -154,20 +154,20 @@ const model_loader = {
             obj.t = util.timer(obj.id).start();
             message = `${obj.id+1} : ${obj.url} : ${obj.size}`;
         }else{
-            model_load.bytes_loaded += Number(obj.size);
+            model_loader.bytes_loaded += Number(obj.size);
             const t = obj.t.stop();
-            message = `${(model_load.queue_length-model_load.count)+1}/${model_load.queue_length} : ${obj.url} : ${util.formatBytes(obj.size)} : ${util.formatMs(t)}.`;
+            message = `${(model_loader.queue_length-model_loader.count)+1}/${model_loader.queue_length} : ${obj.url} : ${util.formatBytes(obj.size)} : ${util.formatMs(t)}.`;
         }
-        model_load.count += count;
+        model_loader.count += count;
         wedge.loader.messages(message);
     },
     run(){
-        model_load.delta_time = util.timer('delta_time').start();
+        model_loader.delta_time = util.timer('delta_time').start();
         const queue = wedge.config.sources.map((ca, id) => {
             return {url: `${ca[1]}`, variable: ca[0], size:'loading', type: 'json', cat: 'sources', id:id};
         });
-        model_load.queue_length = queue.length;
-        loader(queue, model_load.status).then(r => model_load.complete(r, 'sources') );
+        model_loader.queue_length = queue.length;
+        loader(queue, model_loader.status).then(r => model_loader.complete(r, 'sources') );
     }
 }
 
