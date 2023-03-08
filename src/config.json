@@ -1,0 +1,21 @@
+{
+  "standalone_mode" : false,
+  "wedge_has_plotter" : false,
+  "wedge_has_markers" : false,
+  "order": 5,
+  "scale": 6.5,
+  "bias": 0.5,
+  "assets": [
+        ["mappings","./js/assets/mappings-all.json"],
+        ["faces","./js/assets/faces-all.json"],
+        ["indices","./js//assets/indices-all.json"],
+        ["vertices","./js/assets/vertices-all.json"],
+        ["sample_data","./js/1-15-2023-9-50.json"]
+  ],
+  "prepare_model_download" : false,
+  "default_data_shape": [20,91],
+  "gauss": {
+    "on": true,
+    "sigma": 1.5
+  }
+}
