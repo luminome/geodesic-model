@@ -16,5 +16,6 @@
   "gauss": {
     "on": true,
     "sigma": 1.5
-  }
+  },
+  "test": false
 }
