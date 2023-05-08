@@ -733,7 +733,7 @@ const wedge = {
             // Model.model.mesh.rotateY(Math.PI/2);
             //
             // init_vars.data_index = 0;
-            // Model.ready = true;
+            wedge.ready = true;
             wedge.loader.messages(['model build in', util.formatMs(model_timer.stop())]);
         },
         model_loader
